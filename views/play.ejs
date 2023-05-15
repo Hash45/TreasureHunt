@@ -1,0 +1,260 @@
+<head>
+  <style>
+    h1,
+    h2,
+    p {
+      text-align: center;
+      color: white;
+    }
+    body {
+      background-image: url("j.jpeg");
+      background-size: cover;
+      background-position: center;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    p {
+      margin-top: 80px;
+      font-size: x-large;
+      color: white;
+      font-weight: bolder;
+    }
+    .image-container {
+      display: flex;
+      flex-wrap: nowrap; /* Ensure images stay in a single line */
+      justify-content: center;
+      margin-top: 80px;
+    }
+    .image-container img {
+      flex: 0 0 25%; /* Adjust the width of the images as needed */
+      max-width: 100%;
+      width: 200px; /* Set a fixed width for all images */
+      height: 200px; /* Set a fixed height for all images */
+      object-fit: cover; /* Maintain aspect ratio and crop if necessary */
+      margin-right: 30px;
+      margin-left: 10px;
+    }
+    .image-container h3 {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      color:white;
+    }
+    .hidden {
+      display: none;
+    }
+    .clue {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color:#ffd700;
+      color: #fff;
+      font-weight:bolder;
+      font-size: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .clue:hover {
+      background-color:darkgoldenrod;
+    }
+    .score {
+      color:gold;
+      display: block;
+      text-align: center;
+      margin-top:0px;
+      font-size: 25px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.5);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1;
+    }
+  h4{
+    color:#ffd700;
+    display: block;
+      text-align: center;
+      font-size: 24px;
+      margin-top: 20px;
+  }
+    .specifications {
+      display: flex;
+      gap: 20px;
+    }
+    .specifications a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .specifications a img {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
+
+    .specifications a:hover {
+      color: #ffd700;
+    }
+
+    .lef {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <video id="video-background" autoplay muted loop>
+    <source src="vi7.mp4" type="video/mp4">
+  </video>
+  <header>
+    <div class="specifications">
+      <div><a href="/"><img src="ho.png" alt="Home"><span> Home</span></a></div>
+      <div><a href="/instructions"><img src="in.png" alt="instructions"><span> Instructions</span></a></div>
+    <div><a href="/leaderboard"><img src="le.png" alt="leaderboard"><span> Leaderboard</span></a></div>
+    <div class="lef"><a href="/profile"><img src="profile.png" alt="profile"><span>Profile</span></a></div>
+    <div class="lef"><a href="/logout"><img src="log.png" alt="logout"><span> Logout</span></a></div>
+  </div>
+</header>
+<h1>Welcome <%= name %> to the Play page!</h1>
+<h4>Score:</h4>
+<span id="score" class="score"><%= score.toFixed(0) %></span>
+<% if (riddles && riddles.length > 0) { %>
+  <% riddles.forEach((riddle, index) => { %>
+    <div class="riddle-container <%= index === 0 ? '' : 'hidden' %>" id="riddle-container-<%= index %>">
+      <h2><%= riddle.Name %></h2>
+      <div class="image-container">
+        <% const imageNames = riddle.Options.split(','); %>
+        <% imageNames.forEach((imageName) => { %>
+          <% const img = imageName.trim(); %>
+          <% const Name = imageName.split('.').slice(0, -1).join('.'); %>
+          <div>
+            <img src="<%= img %>" alt="<%= img %>" data-riddleid="<%= riddle.id %>" data-correctanswer="<%= riddle.Correct %>">
+            <h3><%= Name %></h3>
+          </div>
+        <% }); %>
+      </div>
+      <button class="clue" data-riddleid="<%= riddle.id %>" data-cluecount="0">Clue</button>
+    </div>
+  <% }); %>
+<% } %>
+
+<script>
+  // Add event listener for beforeunload event
+  window.addEventListener('beforeunload', function (event) {
+    // Cancel the event (prevent the page from refreshing) if needed
+    event.preventDefault();
+    // Chrome requires returnValue to be set
+    event.returnValue = '';
+  });
+
+  const riddles = document.querySelectorAll(".riddle-container");
+  const scoreSpan = document.querySelector("#score");
+  const MAX_WRONG_CLICKS = 5; // Maximum allowed wrong clicks
+  let score = parseInt(scoreSpan.innerHTML);
+  let currentRiddleIndex = 0;
+  let wrongClickCount = 0;
+
+  function showNextRiddle() {
+    riddles[currentRiddleIndex].classList.add("hidden");
+    currentRiddleIndex++;
+
+    if (currentRiddleIndex < riddles.length) {
+      riddles[currentRiddleIndex].classList.remove("hidden");
+    }
+  }
+
+  function handleImageClick(image) {
+    const riddleContainer = image.closest(".riddle-container");
+    const riddleId = image.getAttribute("data-riddleid");
+    const correctAnswer = image.getAttribute("data-correctanswer");
+    const selectedAnswer = image.alt;
+
+    if (selectedAnswer === correctAnswer) {
+      // Redirect to the next riddle
+      const nextRiddleContainer = riddleContainer.nextElementSibling;
+      if (nextRiddleContainer) {
+        nextRiddleContainer.classList.remove("hidden");
+      } else {
+        alert("Congratulations! You have completed all the riddles.");
+        // Perform any other actions or redirect as needed
+      }
+      riddleContainer.classList.add("hidden");
+    } else {
+      wrongClickCount++;
+      if (wrongClickCount > MAX_WRONG_CLICKS) {
+        alert("You clicked on too many wrong options and lost the game!");
+        endGame();
+      } else {
+        alert("Wrong choice! Try again or use a clue.");
+        score -= 2;
+        scoreSpan.innerHTML = score;
+      }
+    }
+  }
+  function handleClueClick(clue) {
+    const riddleId = clue.getAttribute("data-riddleid");
+    let clueCount = parseInt(clue.getAttribute("data-cluecount"));
+
+    // Send a request to get the clue from the server
+    fetch(`/getClue?riddleId=${riddleId}&clueCount=${clueCount}`)
+      .then((response) => response.text())
+      .then((clueText) => {
+        // Alert the clue
+        alert(clueText);
+
+        // Update the score
+        score -= 5;
+        scoreSpan.innerText = score;
+
+        // Increment the clue count
+        clueCount++;
+        clue.setAttribute("data-cluecount", clueCount);
+        
+        // Check if the maximum clue count has been reached
+        if (clueCount > 3) {
+          // Case 1: Used 3 clues for a single riddle
+          alert("You used 3 clues for this riddle and lost the game!");
+          endGame();
+          return;
+        }
+
+        if (wrongClickCount + clueCount > MAX_WRONG_CLICKS) {
+          // Case 2: Total wrong clicks + clue count exceeds the maximum allowed
+          alert("You have chosen too many wrong options and lost the game!");
+          endGame();
+          return;
+        }
+      });
+  }
+  function endGame() {
+  // Redirect or perform any other actions as needed
+  const id = '<%= id %>';
+  const name = '<%= name %>';
+  window.location.href = `/main?id=${id}&name=${name}`;
+}
+  // Add event listeners
+  riddles.forEach((riddle, index) => {
+    const images = riddle.querySelectorAll(".image-container img");
+    const clue = riddle.querySelector(".clue");
+
+    images.forEach((image) => {
+      image.addEventListener("click", () => handleImageClick(image));
+    });
+    clue.addEventListener("click", () => handleClueClick(clue));
+  });
+</script>
+</body>
+</html>

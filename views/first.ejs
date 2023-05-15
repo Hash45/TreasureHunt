@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>The Enchanted Quest</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+      }
+
+      #video-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background-color: rgba(0, 0, 0, 0.5);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1;
+      }
+
+      .specifications {
+        display: flex;
+        gap: 20px;
+      }
+
+      .specifications a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: bold;
+        transition: color 0.3s ease;
+      }
+
+      .specifications a:hover {
+        color: #ffd700;
+      }
+
+      main {
+        padding-top: 200px;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 48px;
+        color: #fff;
+        margin-bottom: 30px;
+      }
+
+      @media screen and (max-width: 768px) {
+        header {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .specifications {
+          margin-top: 10px;
+        }
+
+        main {
+          padding-top: 100px;
+        }
+
+        h1 {
+          font-size: 36px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <video id="video-background" autoplay muted loop>
+      <source src="vi.mp4" type="video/mp4">
+    </video>
+    <header>
+      <div class="specifications">
+        <div><a href="/">Home</a></div>
+        <div><a href="/instructions">Instructions</a></div>
+        <div><a href="/login">Sign Up/Login</a></div>
+      </div>
+    </header>
+    <main>
+      <h1>Mystic Quest</h1>
+    </main>
+  </body>
+</html>
